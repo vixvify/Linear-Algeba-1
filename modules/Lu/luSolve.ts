@@ -1,13 +1,18 @@
 import luDecomposition from "./luDecomposition";
 
 export default function luSolve(A: number[][], b: number[]) {
-  const { L, U } = luDecomposition(A);
+  const { L, U, P } = luDecomposition(A);
   const n = A.length;
+
+  const pb = new Array(n);
+  for (let i = 0; i < n; i++) {
+    pb[i] = b[P[i]];
+  }
 
   const y = new Array(n);
 
   for (let i = 0; i < n; i++) {
-    let sum = b[i];
+    let sum = pb[i];
     for (let j = 0; j < i; j++) {
       sum -= L[i][j] * y[j];
     }

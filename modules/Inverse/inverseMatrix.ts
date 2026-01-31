@@ -18,6 +18,10 @@ export default function inverseMatrix(A: number[][]) {
 
     const pivot = aug[i][i];
 
+    if (Math.abs(pivot) < 1e-12) {
+      throw new Error("Matrix is singular or nearly singular");
+    }
+
     for (let j = 0; j < 2 * n; j++) {
       aug[i][j] /= pivot;
     }
