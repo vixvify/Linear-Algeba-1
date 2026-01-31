@@ -1,4 +1,4 @@
-import inverseMatrix from "./inverseMatrix.service";
+import inverseMatrix from "./inverseMatrix";
 
 export default function inverseSolve(A: number[][], b: number[]) {
   const inv = inverseMatrix(A);
@@ -12,5 +12,5 @@ export default function inverseSolve(A: number[][], b: number[]) {
     }
   }
 
-  return x;
+  return { x, inv };
 }

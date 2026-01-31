@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import gaussEliminationPivot from "@/service/GaussElimination/gaussElimination.service";
-import gaussJordan from "@/service/GaussJordan/gaussJordan.service";
-import inverseSolve from "@/service/Inverse/inverseSolve.service";
-import luSolve from "@/service/Lu/luSolve.service";
-import parseEquations from "@/service/parseEquations.service";
+import gaussEliminationPivot from "@/modules/GaussElimination/gaussElimination";
+import gaussJordan from "@/modules/GaussJordan/gaussJordan";
+import inverseSolve from "@/modules/Inverse/inverseSolve";
+import luSolve from "@/modules/Lu/luSolve.service";
+import parseEquations from "@/modules/parseEquations";
+import matrixToPrettyString from "@/modules/matrixToPrettyString";
 
 export default function LinearSystemUI() {
   const [equation, setEquation] = useState("");
@@ -29,7 +30,19 @@ export default function LinearSystemUI() {
     }
 
     if (methods === "Inverse") {
-      return inverseSolve(A, b);
+      return inverseSolve(A, b).x;
+    }
+
+    return null;
+  }, [equation, methods]);
+
+  const inverse_matrix = useMemo(() => {
+    if (!equation || !methods) return null;
+
+    const { A, b } = parseEquations(equation);
+
+    if (methods === "Inverse") {
+      return inverseSolve(A, b).inv;
     }
 
     return null;
@@ -37,12 +50,12 @@ export default function LinearSystemUI() {
 
   return (
     <div className="min-h-screen p-8 bg-background text-foreground flex justify-center items-center">
-      <div className="max-w-5xl mx-auto space-y-6">
-        <h1 className="text-2xl font-semibold">Linear System Solver</h1>
+      <div className="max-w-5xl mx-auto space-y-10">
+        <h1 className="text-3xl font-semibold">Linear System Solver</h1>
         <div className="border rounded-xl p-4 bg-card">
           <h2 className="font-medium mb-3">Equation</h2>
           <textarea
-            className="border border-white w-full h-30 text-white"
+            className="border border-white w-full h-30 text-white p-4"
             value={equation}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
               setEquation(e.target.value)
@@ -86,14 +99,23 @@ export default function LinearSystemUI() {
 
         <div className="border rounded-xl p-4 bg-card">
           <h2 className="font-medium mb-2">Result</h2>
-          <div className="h-40 border rounded-lg bg-gray-50 flex items-center justify-center text-black text-sm">
-            {result
-              ? result.map((v, i) => (
-                  <div key={i} className="p-2">
-                    x{i + 1} = {v.toFixed(3)}
-                  </div>
-                ))
-              : "No result"}
+          <div className="h-40 border rounded-lg bg-gray-50 flex items-center justify-center gap-10 text-black text-sm">
+            <div className="flex justify-center items-center gap-3">
+              <h2>Answer is </h2>
+              {result
+                ? result.map((v, i) => (
+                    <div key={i} className="p-2">
+                      x{i + 1} = {v.toFixed(3)}
+                    </div>
+                  ))
+                : "No result"}
+            </div>
+            <div className="flex flex-col justify-center items-center gap-3">
+              {inverse_matrix && <h2>Inverse Matrix is</h2>}
+              {inverse_matrix && (
+                <pre>{matrixToPrettyString(inverse_matrix)}</pre>
+              )}
+            </div>
           </div>
         </div>
       </div>
